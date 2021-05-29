@@ -19,11 +19,13 @@ public class Transaction {
 
     private BigDecimal amount;
 
-    private UUID reference;
+    private String reference;
 
     private String description;
 
     private Long dateCreated;
+
+    public Transaction(){}
 
     public Long getAccountNumber() {
         return accountNumber;
@@ -65,11 +67,11 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public UUID getReference() {
+    public String getReference() {
         return reference;
     }
 
-    public void setReference(UUID reference) {
+    public void setReference(String reference) {
         this.reference = reference;
     }
 

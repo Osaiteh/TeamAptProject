@@ -17,7 +17,12 @@ public class BalanceService {
     }
 
     public Balance fetchCurrentBalance(Long accountNumber) {
-        return  balanceRepository.findByAccountNumber(accountNumber);
+        Balance balance = balanceRepository.findByAccountNumber(accountNumber);
+        if (balance != null) {
+            return balance;
+        }
+        Balance newUserBalance = new Balance(accountNumber, BigDecimal.ZERO);
+        return balanceRepository.save(newUserBalance);
     }
 
     public boolean isBalanceSufficient(Long accountNumber, BigDecimal amount)  {

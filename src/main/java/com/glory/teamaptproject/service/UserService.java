@@ -30,6 +30,10 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
     public SignupResponse signup(SignupRequest signupRequest) throws UserExistException {
         User existingUser = userRepository.findByUsername(signupRequest.getUsername());
         if (existingUser != null) {
@@ -43,9 +47,8 @@ public class UserService {
 
         // set the account number to become the newly generated id
         createdUser.setAccountNumber(user.getId());
-
+        createdUser = userRepository.save(createdUser);
         return new SignupResponse(createdUser.getUsername(), createdUser.getAccountNumber());
-
     }
 
     public LoginResponse login(LoginRequest loginRequest) throws Exception {

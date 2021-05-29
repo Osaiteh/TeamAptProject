@@ -23,22 +23,21 @@ public class TransactionService {
     }
 
     @Transactional
-    public Transaction newTransaction(TransactionRequest transactionDto) throws InsufficientBalanceException {
-        Transaction existingTransaction = transactionRepository.findFirstByReferenceAndTransactionType(transactionDto.getReference(), TransactionType.DEBIT);
+    public Transaction newTransaction(TransactionRequest transactionRequest, long sourceAccountNumber) throws InsufficientBalanceException {
+        Transaction existingTransaction = transactionRepository.findByReferenceAndTransactionType(transactionRequest.getReference().toString(), TransactionType.DEBIT);
         if (existingTransaction != null) {
             // transaction with this transaction reference has been processed before
             return existingTransaction;
         }
 
-        long sourceAccountNumber = 1L;
-        if (!balanceService.isBalanceSufficient(sourceAccountNumber, transactionDto.getAmount()))  {
+        if (!balanceService.isBalanceSufficient(sourceAccountNumber, transactionRequest.getAmount()))  {
             throw new InsufficientBalanceException("Insufficient balance to carry out operation");
         }
 
-        Transaction sourceTransaction = createDebitTransaction(sourceAccountNumber, transactionDto);
-        Balance senderUpdatedBalance = balanceService.updateBalanceByAccountNumber(sourceAccountNumber, transactionDto.getAmount(), TransactionType.DEBIT);
-        Transaction destinationTransaction =createCreditTransaction(transactionDto);
-        Balance recipientUpdatedBalance = balanceService.updateBalanceByAccountNumber(transactionDto.getDestinationAccountNumber(), transactionDto.getAmount(), TransactionType.CREDIT);
+        Transaction sourceTransaction = createDebitTransaction(sourceAccountNumber, transactionRequest);
+        Balance senderUpdatedBalance = balanceService.updateBalanceByAccountNumber(sourceAccountNumber, transactionRequest.getAmount(), TransactionType.DEBIT);
+        Transaction destinationTransaction =createCreditTransaction(transactionRequest);
+        Balance recipientUpdatedBalance = balanceService.updateBalanceByAccountNumber(transactionRequest.getDestinationAccountNumber(), transactionRequest.getAmount(), TransactionType.CREDIT);
 
         return sourceTransaction;
     }
@@ -63,7 +62,7 @@ public class TransactionService {
         Transaction transaction = new Transaction();
 
         transaction.setAmount(transactionDto.getAmount());
-        transaction.setReference(transactionDto.getReference());
+        transaction.setReference(transactionDto.getReference().toString());
         transaction.setDescription(transactionDto.getDescription());
         transaction.setDateCreated(AppUtils.getCurrentTime());
 

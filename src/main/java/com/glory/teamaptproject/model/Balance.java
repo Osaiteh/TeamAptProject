@@ -16,6 +16,13 @@ public class Balance {
 
     private BigDecimal amount;
 
+    public Balance(Long accountNumber, BigDecimal amount) {
+        this.accountNumber = accountNumber;
+        this.amount = amount;
+    }
+
+    public Balance(){}
+
     public Long getId() {
         return id;
     }
